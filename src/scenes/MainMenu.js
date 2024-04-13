@@ -60,7 +60,7 @@ const createAccount = async () => {
   }
 }
 
-export class MainMenu extends Scene {
+export class MainMenu extends Phaser.Scene {
   constructor() {
     super("MainMenu");
   }
@@ -68,7 +68,37 @@ export class MainMenu extends Scene {
   create() {
     this.add.image(512, 384, "background");
 
-    this.add.image(512, 350, "logo");
+    const logo = this.add.image(512, 300, "logo");
+
+    // Button 1
+    const button1 = this.add.sprite(512, 480, "buttonTexture")
+      .setInteractive()
+      .on('pointerdown', () => {
+        console.log('Button 1 clicked!');
+        // Add your button 1 functionality here
+      });
+
+    // Button 2
+    const button2 = this.add.sprite(512, 580, "buttonTexture")
+      .setInteractive()
+      .on('pointerdown', () => {
+        console.log('Button 2 clicked!');
+        // Add your button 2 functionality here
+      });
+
+    // Optionally, you can set the origin of the buttons for positioning
+    button1.setOrigin(0.5);
+    button2.setOrigin(0.5);
+
+    // Optionally, you can set a different scale for the buttons
+    button1.setScale(0.8);
+    button2.setScale(0.8);
+
+    // Optionally, you can add text labels to the buttons
+    this.add.text(button1.x, button1.y, 'Create Account', { fontFamily: 'Arial', fontSize: 24, color: '#ffffff' })
+      .setOrigin(0.5);
+    this.add.text(button2.x, button2.y, 'Connect Wallet', { fontFamily: 'Arial', fontSize: 24, color: '#ffffff' })
+      .setOrigin(0.5);
 
     this.input.once("pointerdown", () => {
       this.scene.start("Game");
