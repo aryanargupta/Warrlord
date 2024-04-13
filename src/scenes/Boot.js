@@ -21,6 +21,7 @@ export class Boot extends Scene
         this.load.audio('bgm', ['assets/bgm.mp3']);
         this.load.image('mine', 'assets/mine.png');
         this.load.image('toggleButton', 'assets/soundtoggle.png');
+        this.load.image('shop', 'assets/shop.png');
     }
 
     create ()
