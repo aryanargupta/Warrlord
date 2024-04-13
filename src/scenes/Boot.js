@@ -22,6 +22,10 @@ export class Boot extends Scene
         this.load.image('mine', 'assets/mine.png');
         this.load.image('toggleButton', 'assets/soundtoggle.png');
         this.load.image('shop', 'assets/shop.png');
+        this.load.image('ethcoin', 'assets/ethcoin.png');
+        this.load.image('border', 'assets/border.png');
+        this.load.image('buttonTexture', 'assets/buttonTexture.png');
+        this.load.image('cointooltip', 'assets/cointooltip.png');
     }
 
     create ()

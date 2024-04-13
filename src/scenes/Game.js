@@ -10,6 +10,8 @@ export class Game extends Scene {
 
     this.add.image(512, 384, "gameBG").setAlpha(0.5);
 
+    this.add.image(512, 384, "border");
+
     const townhall = this.add.sprite(540, 230, "townhall");
     townhall.scale = 0.3;
     townhall.flipX = true;
@@ -46,7 +48,7 @@ export class Game extends Scene {
     const bgm = this.sound.add("bgm", { loop: true });
     bgm.play();
 
-    const toggleButton = this.add.sprite(100, 100, "toggleButton").setDepth(1);
+    const toggleButton = this.add.sprite(100, 50, "toggleButton").setDepth(1);
     toggleButton.scale = 0.3;
     toggleButton.setInteractive();
     toggleButton.on("pointerover", () => {
@@ -55,7 +57,6 @@ export class Game extends Scene {
     toggleButton.on("pointerout", () => {
       toggleButton.setScale(0.3);
     });
-
 
     let isBgmPlaying = true; // Flag to track if bgm is playing
 
@@ -78,43 +79,81 @@ export class Game extends Scene {
     const barWidth = 200;
     const barHeight = 20;
     const barX = 800;
-    const barY = 100;
+    const barY = 30;
 
     const updateCoinBar = () => {
       const percentFilled = (coinCount / maxCoins) * 100;
       coinBar.clear();
       coinBar.fillStyle(0xffd700); // Gold color
-      coinBar.fillRect(barX, barY, barWidth * (percentFilled / 100), barHeight);
+      coinBar.fillRoundedRect(
+        barX,
+        barY,
+        barWidth * (percentFilled / 100),
+        barHeight,
+        barHeight / 2
+      ); // Rounded rectangle
 
-      // Draw border around the bar
+      // Draw rounded border around the bar
       coinBar.lineStyle(2, 0xffffff); // White color, 2px thickness
-      coinBar.strokeRect(barX, barY, barWidth, barHeight);
+      coinBar.beginPath();
+      coinBar.moveTo(barX + barHeight / 2, barY);
+      coinBar.lineTo(barX + barWidth - barHeight / 2, barY);
+      coinBar.arc(
+        barX + barWidth - barHeight / 2,
+        barY + barHeight / 2,
+        barHeight / 2,
+        -Math.PI / 2,
+        Math.PI / 2,
+        false
+      );
+      coinBar.lineTo(barX + barHeight / 2, barY + barHeight);
+      coinBar.arc(
+        barX + barHeight / 2,
+        barY + barHeight / 2,
+        barHeight / 2,
+        Math.PI / 2,
+        -Math.PI / 2,
+        false
+      );
+      coinBar.closePath();
+      coinBar.stroke();
     };
 
     updateCoinBar(); // Initial update
 
-    // Show popup over mine every 5 seconds
+    // Show tooltip over mine every 5 seconds
     this.time.addEvent({
-      delay: 2000, // 5 seconds in milliseconds
+      delay: 4000, // 5 seconds in milliseconds
       loop: true,
       callback: () => {
-        const popupText = this.add.text(mine.x, mine.y - 50, 'Found a coin', { fontSize: '24px', fill: '#fff' });
-        popupText.setOrigin(0.5);
+        const cointooltip = this.add.image(mine.x, mine.y - 50, "cointooltip").setAlpha(0);
+        cointooltip.scale = 0.3
         this.tweens.add({
-          targets: popupText,
-          alpha: 0,
-          duration: 2000, // 2 seconds
+          targets: cointooltip,
+          alpha: 1,
+          duration: 500, // Fade in duration
+          delay: 500, // Delay before fading out
           onComplete: () => {
-            popupText.destroy();
-            // Increment coin count and update bar
-            if (coinCount < maxCoins) {
-              coinCount++;
-            }
-            updateCoinBar();
-          }
+            this.tweens.add({
+              targets: cointooltip,
+              alpha: 0,
+              duration: 500, // Fade out duration
+              delay: 500, // Delay before next popup
+              onComplete: () => {
+                cointooltip.destroy();
+                // Increment coin count and update bar
+                if (coinCount < maxCoins) {
+                  coinCount++;
+                }
+                updateCoinBar();
+              },
+            });
+          },
         });
-      }
+      },
     });
+
+    this.add.image(780, 40, "ethcoin").setScale(0.1);
 
     // Rotate cannon by 90 degrees every 3 seconds
     this.time.addEvent({
@@ -122,7 +161,7 @@ export class Game extends Scene {
       loop: true,
       callback: () => {
         cannon.flipX = !cannon.flipX;
-      }
+      },
     });
 
     // this.input.once("pointerdown", () => {
