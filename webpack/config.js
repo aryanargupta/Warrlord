@@ -64,6 +64,7 @@ module.exports = {
             url: require.resolve("url"),
             zlib: require.resolve("browserify-zlib"),
             path: require.resolve("path-browserify"),
+            vm: require.resolve("vm-browserify"),
             "process/browser": require.resolve("process/browser"),
         }
     }
