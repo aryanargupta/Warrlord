@@ -46,6 +46,25 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./index.html"
+        }),
+        new webpack.ProvidePlugin({
+            Buffer: ["buffer", "Buffer"],
+            process: "process/browser"
         })
-    ]
+    ],
+    resolve: {
+        fallback: {
+            fs: false,
+            crypto: require.resolve("crypto-browserify"),
+            stream: require.resolve("stream-browserify"),
+            assert: require.resolve("assert"),
+            http: require.resolve("stream-http"),
+            os: require.resolve("os-browserify"),
+            https: require.resolve("https-browserify"),
+            url: require.resolve("url"),
+            zlib: require.resolve("browserify-zlib"),
+            path: require.resolve("path-browserify"),
+            "process/browser": require.resolve("process/browser"),
+        }
+    }
 };
