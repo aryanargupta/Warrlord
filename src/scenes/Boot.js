@@ -26,6 +26,12 @@ export class Boot extends Scene
         this.load.image('border', 'assets/border.png');
         this.load.image('buttonTexture', 'assets/buttonTexture.png');
         this.load.image('cointooltip', 'assets/cointooltip.png');
+        this.load.image('popupBackground', 'assets/shopBackground.png');
+        this.load.image('closeButton', 'assets/closeButton.png');
+        this.load.image('goldStorage', 'assets/goldStorage.png');
+        this.load.image('armyCamp', 'assets/armyCamp.png');
+        this.load.html('goldCoinInput', 'assets/goldCoinInput.html');
+        this.load.html('usdcInput', 'assets/usdcInput.html');
     }
 
     create ()
