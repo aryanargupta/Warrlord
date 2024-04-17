@@ -1,4 +1,3 @@
-import { Scene } from "phaser";
 import { accountConfig, authConfig } from "../utils/constants";
 import {
   createWalletClient,
@@ -10,11 +9,11 @@ import { createSmartAccountClient } from "@biconomy/account";
 import { ethers } from "ethers";
 import { Web3Auth } from "@web3auth/modal";
 
-const connectWallet = async () => {
+const connectWallet = async (scene) => {
   if (!window.ethereum) return;
   const [account] = await window.ethereum.request({
     method: "eth_requestAccounts",
-  });
+  }); 
 
   // switch chain
   await window.ethereum.request({
@@ -34,6 +33,10 @@ const connectWallet = async () => {
     biconomyPaymasterApiKey: accountConfig.biconomyPaymasterApiKey,
   });
   console.log(await smartAccount.getAddress())
+
+  if(!smartAccount) return;
+
+  scene.start("Game", { smartAccount });
 }
 
 const createAccount = async () => {
@@ -73,18 +76,12 @@ export class MainMenu extends Phaser.Scene {
     // Button 1
     const button1 = this.add.sprite(512, 480, "buttonTexture")
       .setInteractive()
-      .on('pointerdown', () => {
-        console.log('Button 1 clicked!');
-        // Add your button 1 functionality here
-      });
+      .on('pointerdown', createAccount);
 
     // Button 2
     const button2 = this.add.sprite(512, 580, "buttonTexture")
       .setInteractive()
-      .on('pointerdown', () => {
-        console.log('Button 2 clicked!');
-        // Add your button 2 functionality here
-      });
+      .on('pointerdown', () => connectWallet(this.scene));
 
     // Optionally, you can set the origin of the buttons for positioning
     button1.setOrigin(0.5);
@@ -99,9 +96,5 @@ export class MainMenu extends Phaser.Scene {
       .setOrigin(0.5);
     this.add.text(button2.x, button2.y, 'Connect Wallet', { fontFamily: 'Arial', fontSize: 24, color: '#ffffff' })
       .setOrigin(0.5);
-
-    this.input.once("pointerdown", () => {
-      this.scene.start("Game");
-    });
   }
 }

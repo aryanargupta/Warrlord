@@ -5,7 +5,7 @@ export class Game extends Scene {
     super("Game");
   }
 
-  create() {
+  create({ smartAccount }) {
     this.add.image(512, 384, "gameBG");
 
     this.add.image(512, 384, "gameBG").setAlpha(0.5);
