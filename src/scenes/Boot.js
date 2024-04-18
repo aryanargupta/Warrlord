@@ -13,7 +13,6 @@ export class Boot extends Scene
         //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
 
         this.load.image('background', 'assets/bg.png');
-        this.load.image('gameScreen', 'assets/gameScreen.png');
         this.load.image('gameBG', 'assets/gameBG.png');
         this.load.image('townhall', 'assets/townhall.png');
         this.load.image('cannon', 'assets/cannon.png');
@@ -30,8 +29,6 @@ export class Boot extends Scene
         this.load.image('closeButton', 'assets/closeButton.png');
         this.load.image('goldStorage', 'assets/goldStorage.png');
         this.load.image('armyCamp', 'assets/armyCamp.png');
-        this.load.html('goldCoinInput', 'assets/goldCoinInput.html');
-        this.load.html('usdcInput', 'assets/usdcInput.html');
     }
 
     create ()

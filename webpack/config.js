@@ -50,7 +50,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             Buffer: ["buffer", "Buffer"],
             process: "process/browser"
-        })
+        }),
     ],
     resolve: {
         fallback: {
