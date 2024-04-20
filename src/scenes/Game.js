@@ -1,6 +1,8 @@
 import { Scene } from "phaser";
 import { ethers } from "ethers";
 import { gameManagerAbi, gameManagerAddress } from "../utils/contracts";
+import { encodeFunctionData } from "viem";
+import { PaymasterMode } from "@biconomy/account";
 
 const loadState = async (smartAccount) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -14,6 +16,44 @@ const loadState = async (smartAccount) => {
   );
   return state;
 };
+
+const mineCoin = async (smartAccount) => {
+  const encodedCall = encodeFunctionData({
+    abi: gameManagerAbi,
+    functionName: "mine",
+    args: [],
+  });
+  const userOpResponse = await smartAccount.sendTransaction({
+    to: gameManagerAddress,
+    data: encodedCall,
+  }, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED }
+  });
+
+  const { transactionHash } = await userOpResponse.waitForTxHash();
+  console.log('hash', transactionHash);
+  const receipt = await userOpResponse.wait()
+  console.log('receipt', receipt);
+}
+
+const buyBuilding = async (smartAccount) => {
+  const encodedCall = encodeFunctionData({
+    abi: gameManagerAbi,
+    functionName: "buy_or_upgrade_storage",
+    args: [],
+  });
+  const userOpResponse = await smartAccount.sendTransaction({
+    to: gameManagerAddress,
+    data: encodedCall,
+  }, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED }
+  });
+
+  const { transactionHash } = await userOpResponse.waitForTxHash();
+  console.log('hash', transactionHash);
+  const receipt = await userOpResponse.wait()
+  console.log('receipt', receipt);
+}
 
 export class Game extends Scene {
   constructor() {
@@ -194,7 +234,7 @@ export class Game extends Scene {
     });
 
     const mineCapacity = 10; // Maximum coins that can be stored in the mine
-    let mineCount = 0; // Current coins in the mine
+    let mineCount = 1; // Current coins in the mine
     const coinBarCapacity = 500; // Maximum coins that can be in the coin bar
     let coinCount = balance.toNumber(); // Current coins in the coin bar
 
@@ -246,13 +286,13 @@ export class Game extends Scene {
     };
 
     // Show the balance text below the coin bar
-    const balanceText = this.add.text(750, 70, "Storage: " + coinCount + "/"+coinBarCapacity + " coins", {
+    const balanceText = this.add.text(750, 70, "Storage: " + coinCount + "/" + coinBarCapacity + " coins", {
       fontSize: "20px",
       //yellow color
       fill: "#fff",
       // bold
       fontStyle: "bold",
-      
+
     });
 
     const updateBalance = () => {
@@ -264,9 +304,9 @@ export class Game extends Scene {
 
     let latestTooltip = null; // Track the latest created tooltip
 
-    // Show tooltip over mine every 5 seconds
+    // Show tooltip over mine every 60 seconds
     this.time.addEvent({
-      delay: 4000, // 5 seconds in milliseconds
+      delay: 60000, // 60 seconds in milliseconds
       loop: true,
       callback: () => {
         // Check if a tooltip already exists
@@ -289,7 +329,7 @@ export class Game extends Scene {
         });
 
         cointooltip.setInteractive();
-        cointooltip.on("pointerup", () => {
+        cointooltip.on("pointerup", async () => {
           cointooltip.destroy();
           if (mineCount > 0) {
             coinCount += mineCount;
@@ -297,6 +337,7 @@ export class Game extends Scene {
               coinCount = coinBarCapacity;
             }
             mineCount = 0;
+            await mineCoin(smartAccount);
             updateCoinBar();
           }
         });
@@ -304,18 +345,16 @@ export class Game extends Scene {
         latestTooltip = cointooltip;
       },
     });
-
+    updateCoinBar()
     // Increment mine count and update bar when a coin is found
     const incrementMine = () => {
-      if (mineCount < mineCapacity) {
+      if (mineCount < mineCapacity) 
         mineCount++;
-        updateCoinBar();
-      }
     };
 
-    // Trigger incrementMine every 2 seconds
+    // Trigger incrementMine every 1 minutes
     this.time.addEvent({
-      delay: 4000, // 2 seconds in milliseconds
+      delay: 60000, // 1 minutes in milliseconds
       loop: true,
       callback: () => {
         incrementMine();
@@ -436,18 +475,21 @@ export class Game extends Scene {
     };
 
     // Set up click events for buy buttons
-    buyGoldStorageButton.on("pointerup", () => {
+    buyGoldStorageButton.on("pointerup", async () => {
+      await buyBuilding(smartAccount);
+      coinCount -= 100;
       handleBuyButtonClick(buyGoldStorageButton, "goldStorage");
     });
 
-    buyArmyCampButton.on("pointerup", () => {
+    buyArmyCampButton.on("pointerup", async () => {
+      coinCount -= 200;
       handleBuyButtonClick(buyArmyCampButton, "armyCamp");
     });
 
-    if (gold_storage >= 0) {
+    if (gold_storage >= 1) {
       handleBuyButtonClick(buyGoldStorageButton, "goldStorage");
     }
-    if (camp >= 0) {
+    if (camp >= 1) {
       handleBuyButtonClick(buyArmyCampButton, "armyCamp");
     }
 

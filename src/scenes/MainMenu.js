@@ -11,7 +11,7 @@ const connectWallet = async (scene) => {
   if (!window.ethereum) return;
   const [account] = await window.ethereum.request({
     method: "eth_requestAccounts",
-  }); 
+  });
 
   // switch chain
   await window.ethereum.request({
@@ -32,7 +32,7 @@ const connectWallet = async (scene) => {
   });
   console.log(await smartAccount.getAddress())
 
-  if(!smartAccount) return;
+  if (!smartAccount) return;
   await check_and_register(smartAccount);
 
   scene.start("Game", { smartAccount });
@@ -57,34 +57,34 @@ const createAccount = async () => {
 
     console.log(await smartWallet.getAddress());
   }
-  catch(err){
+  catch (err) {
     console.log(err);
   }
 }
 
 const check_and_register = async (smartAccount) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const gameContract = new ethers.Contract(gameManagerAddress, gameManagerAbi, provider);
-    const isRegistered = await gameContract.isPlayerExist(await smartAccount.getAddress());
-    console.log('isRegistered?', isRegistered);
-    if(isRegistered) return;
-    // Register player if not already registered
-    const encodedCall = encodeFunctionData({
-        abi: gameManagerAbi,
-        functionName: "initialize",
-        args: [],
-    });
-    const userOpResponse = await smartAccount.sendTransaction({
-      to: gameManagerAddress,
-      data: encodedCall,
-    }, {
-      paymasterServiceData: {mode: PaymasterMode.SPONSORED}
-    });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const gameContract = new ethers.Contract(gameManagerAddress, gameManagerAbi, provider);
+  const isRegistered = await gameContract.isPlayerExist(await smartAccount.getAddress());
+  console.log('isRegistered?', isRegistered);
+  if (isRegistered) return;
+  // Register player if not already registered
+  const encodedCall = encodeFunctionData({
+    abi: gameManagerAbi,
+    functionName: "initialize",
+    args: [],
+  });
+  const userOpResponse = await smartAccount.sendTransaction({
+    to: gameManagerAddress,
+    data: encodedCall,
+  }, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED }
+  });
 
-    const hash = await userOpResponse.waitForTxHash();
-    console.log('hash', hash);
-    const receipt = await userOpResponse.wait()
-    console.log('receipt', receipt);
+  const { transactionHash } = await userOpResponse.waitForTxHash();
+  console.log('hash', transactionHash);
+  const receipt = await userOpResponse.wait()
+  console.log('receipt', receipt);
 }
 
 export class MainMenu extends Phaser.Scene {
