@@ -1,4 +1,13 @@
 import { Scene } from "phaser";
+import { ethers } from "ethers";
+import { gameManagerAbi, gameManagerAddress } from "../utils/contracts";
+
+const loadState = async (smartAccount) => {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const gameContract = new ethers.Contract(gameManagerAddress, gameManagerAbi, provider);
+  const state = await gameContract.getPlayerState(await smartAccount.getAddress());
+  return state;
+}
 
 export class Game extends Scene {
   constructor() {
@@ -25,11 +34,11 @@ export class Game extends Scene {
     );
   }
 
-  create({ smartAccount }) {
+  async create({ smartAccount }) {
+    const gameState = await loadState(smartAccount);
+
     this.add.image(512, 384, "gameBG");
-
     this.add.image(512, 384, "gameBG").setAlpha(0.5);
-
     this.add.image(512, 384, "border");
 
     const townhall = this.add.sprite(510, 230, "townhall");

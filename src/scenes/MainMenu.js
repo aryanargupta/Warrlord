@@ -1,13 +1,11 @@
 import { accountConfig, authConfig } from "../utils/constants";
-import {
-  createWalletClient,
-  custom
-} from "viem";
-import { baseGoerli } from "viem/chains";
-import "viem/window";
-import { createSmartAccountClient } from "@biconomy/account";
+import { gameManagerAbi, gameManagerAddress } from "../utils/contracts";
+import { createWalletClient, custom, encodeFunctionData } from "viem";
+import { sepolia } from "viem/chains";
+import { PaymasterMode, createSmartAccountClient } from "@biconomy/account";
 import { ethers } from "ethers";
 import { Web3Auth } from "@web3auth/modal";
+import "viem/window";
 
 const connectWallet = async (scene) => {
   if (!window.ethereum) return;
@@ -18,12 +16,12 @@ const connectWallet = async (scene) => {
   // switch chain
   await window.ethereum.request({
     method: "wallet_switchEthereumChain",
-    params: [{ chainId: "0x14a33" }],
+    params: [{ chainId: "0xaa36a7" }],
   });
 
   const walletClient = createWalletClient({
     account,
-    chain: baseGoerli,
+    chain: sepolia,
     transport: custom(window.ethereum),
   });
 
@@ -35,6 +33,7 @@ const connectWallet = async (scene) => {
   console.log(await smartAccount.getAddress())
 
   if(!smartAccount) return;
+  await check_and_register(smartAccount);
 
   scene.start("Game", { smartAccount });
 }
@@ -61,6 +60,31 @@ const createAccount = async () => {
   catch(err){
     console.log(err);
   }
+}
+
+const check_and_register = async (smartAccount) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const gameContract = new ethers.Contract(gameManagerAddress, gameManagerAbi, provider);
+    const isRegistered = await gameContract.isPlayerExist(await smartAccount.getAddress());
+    console.log('isRegistered?', isRegistered);
+    if(isRegistered) return;
+    // Register player if not already registered
+    const encodedCall = encodeFunctionData({
+        abi: gameManagerAbi,
+        functionName: "initialize",
+        args: [],
+    });
+    const userOpResponse = await smartAccount.sendTransaction({
+      to: gameManagerAddress,
+      data: encodedCall,
+    }, {
+      paymasterServiceData: {mode: PaymasterMode.SPONSORED}
+    });
+
+    const hash = await userOpResponse.waitForTxHash();
+    console.log('hash', hash);
+    const receipt = await userOpResponse.wait()
+    console.log('receipt', receipt);
 }
 
 export class MainMenu extends Phaser.Scene {

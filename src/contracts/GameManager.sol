@@ -9,9 +9,8 @@ contract GameManager {
     uint64 DEFAULT_MINING_RATE = 10;
     uint64 MINE_BASE_PRICE = 100;
 
-    constructor (address _gold)  {
-        admin = msg.sender ;
-        goldContract = IERC20(_gold);
+    constructor ()  {
+        admin = msg.sender;
     }
 
     struct State {
