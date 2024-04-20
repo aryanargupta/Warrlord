@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IERC20 } from "./IERC20.sol";
+import "./IERC20.sol";
 
 contract GameManager {
     IERC20 goldContract;
     address public admin;
-    uint64 DEFAULT_MINING_RATE = 10;
+    uint64 DEFAULT_MINING_RATE = 60;
     uint64 MINE_BASE_PRICE = 100;
 
     constructor ()  {
-        admin = msg.sender;
+        admin = msg.sender ;
     }
 
     struct State {
@@ -40,18 +40,19 @@ contract GameManager {
             1,
             0,
             block.timestamp,
-            50
+            150
         );
         isPlayerExist[msg.sender] = true ;
+        goldContract.mint(msg.sender, 150);
     }
 
     function mine() external {
         require(isPlayerExist[msg.sender], "Player does not exist");
         uint8 mine_level = gameStates[msg.sender].mine;
-        uint256 amount = ((gameStates[msg.sender].last_mined - block.timestamp) * (DEFAULT_MINING_RATE * mine_level)) / 3600;
-        goldContract.mint(msg.sender, amount);
+        uint256 amount = ((block.timestamp - gameStates[msg.sender].last_mined) * (DEFAULT_MINING_RATE * mine_level)) / 3600;
         gameStates[msg.sender].balance += amount;
         gameStates[msg.sender].last_mined = block.timestamp;
+        goldContract.mint(msg.sender, amount);
     }
 
     function buy_or_upgrade_storage() external {

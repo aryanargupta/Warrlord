@@ -35,7 +35,6 @@ contract LiquidityPool {
 
     // Function to add liquidity by depositing GOLD and USDC tokens
     function addLiquidity(uint256 goldAmount, uint256 usdcAmount) external {
-        require(msg.sender == gameManager, "Unauthorized");
         require(goldAmount > 0 && usdcAmount > 0, "Amount must be greater than 0");
 
         goldToken.transferFrom(msg.sender, address(this), goldAmount);
@@ -47,7 +46,6 @@ contract LiquidityPool {
 
     // Function to swap GOLD for USDC
     function swapGoldForUsdc(uint256 goldAmount) external {
-        require(msg.sender == gameManager, "Unauthorized");
         require(goldAmount > 0, "Amount must be greater than 0");
 
         uint256 usdcAmount = (goldAmount * totalUsdc) / totalGold;
@@ -61,7 +59,6 @@ contract LiquidityPool {
 
     // Function to swap USDC for GOLD
     function swapUsdcForGold(uint256 usdcAmount) external {
-        require(msg.sender == gameManager, "Unauthorized");
         require(usdcAmount > 0, "Amount must be greater than 0");
 
         uint256 goldAmount = (usdcAmount * totalGold) / totalUsdc;

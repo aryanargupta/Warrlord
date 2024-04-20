@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { ethers } from "ethers";
-import { gameManagerAbi, gameManagerAddress } from "../utils/contracts";
+import { gameManagerAbi, gameManagerAddress, goldAbi, goldAddress, usdcAbi, usdcAddress, lpAbi, lpAddress } from "../utils/contracts";
 import { encodeFunctionData } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 
@@ -60,6 +60,70 @@ const buyBuilding = async (smartAccount) => {
   const receipt = await userOpResponse.wait();
   console.log("receipt", receipt);
 };
+
+const addLiquidity = async (smartAccount, usdcAmount, goldCoinAmount) => {
+
+  const encodedCall_1 = encodeFunctionData({
+    abi: goldAbi,
+    functionName: "approve",
+    args: [lpAddress, goldCoinAmount],
+  });
+
+  const encodedCall_2 = encodeFunctionData({
+    abi: usdcAbi,
+    functionName: "approve",
+    args: [lpAddress, usdcAmount],
+  });
+
+  const encodedCall_3 = encodeFunctionData({
+    abi: lpAbi,
+    functionName: "addLiquidity",
+    args: [goldCoinAmount, usdcAmount],
+  });
+
+  const txs = [
+    { to: goldAddress, data: encodedCall_1 },
+    { to: usdcAddress, data: encodedCall_2 },
+    { to: lpAddress, data: encodedCall_3 }
+  ];
+
+  const userOpResponse = await smartAccount.sendTransaction(txs, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await userOpResponse.waitForTxHash();
+  console.log("hash", transactionHash);
+  const receipt = await userOpResponse.wait();
+  console.log("receipt", receipt);
+}
+
+const swapUsdcForGold = async (smartAccount, usdcAmount) => {
+  const encodedCall_1 = encodeFunctionData({
+    abi: usdcAbi,
+    functionName: "approve",
+    args: [lpAddress, usdcAmount],
+  });
+
+  const encodedCall_2 = encodeFunctionData({
+    abi: lpAbi,
+    functionName: "swapUsdcForGold",
+    args: [usdcAmount],
+  });
+
+  const txs = [
+    { to: usdcAddress, data: encodedCall_1 },
+    { to: lpAddress, data: encodedCall_2 }
+  ];
+
+  const userOpResponse = await smartAccount.sendTransaction(txs, {
+    paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+  });
+
+  const { transactionHash } = await userOpResponse.waitForTxHash();
+  console.log("hash", transactionHash);
+  const receipt = await userOpResponse.wait();
+  console.log("receipt", receipt);
+}
 
 export class Game extends Scene {
   constructor() {
@@ -604,7 +668,7 @@ export class Game extends Scene {
         selectAll: true,
         onTextChanged: function (textObject, text) {
           textObject.text = text;
-          goldCoinAmount.text = (parseFloat(text) * 100).toString();
+          goldCoinAmount.text = (parseFloat(text) * 50).toString();
         }
       });
 
@@ -646,10 +710,10 @@ export class Game extends Scene {
       addLiquidityPopup.add(addLiquidityButtonText);
 
       // Functionality for Add Liquidity button
-      addLiquidityButton.on("pointerup", () => {
-        // Add your logic here for adding liquidity
-        console.log("Add Liquidity button clicked");
-        console.log(usdcAmount.text+ " " + goldCoinAmount.text);
+      addLiquidityButton.on("pointerup", async () => {
+        await addLiquidity(smartAccount, usdcAmount.text, goldCoinAmount.text);
+        coinCount -= goldCoinAmount.text;
+        console.log(usdcAmount.text + " " + goldCoinAmount.text);
       });
 
       this.tweens.add({
@@ -734,7 +798,7 @@ export class Game extends Scene {
         selectAll: true,
         onTextChanged: function (textObject, text) {
           textObject.text = text;
-          goldCoinAmount.text = (parseFloat(text) * 100).toString();
+          goldCoinAmount.text = (parseFloat(text) * 50).toString();
         }
       });
 
@@ -776,10 +840,11 @@ export class Game extends Scene {
       swapPopup.add(swapButtonText);
 
       // Functionality for Add Liquidity button
-      swapButton.on("pointerup", () => {
+      swapButton.on("pointerup", async () => {
         // Add your logic here for adding liquidity
-        console.log("Swap button clicked");
-        console.log(usdcAmount.text+ " " + goldCoinAmount.text);
+        await swapUsdcForGold(smartAccount, usdcAmount.text);
+        coinCount += goldCoinAmount.text;
+        console.log(usdcAmount.text + " " + goldCoinAmount.text);
       });
 
       this.tweens.add({
