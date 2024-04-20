@@ -23,18 +23,21 @@ const mineCoin = async (smartAccount) => {
     functionName: "mine",
     args: [],
   });
-  const userOpResponse = await smartAccount.sendTransaction({
-    to: gameManagerAddress,
-    data: encodedCall,
-  }, {
-    paymasterServiceData: { mode: PaymasterMode.SPONSORED }
-  });
+  const userOpResponse = await smartAccount.sendTransaction(
+    {
+      to: gameManagerAddress,
+      data: encodedCall,
+    },
+    {
+      paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+    }
+  );
 
   const { transactionHash } = await userOpResponse.waitForTxHash();
-  console.log('hash', transactionHash);
-  const receipt = await userOpResponse.wait()
-  console.log('receipt', receipt);
-}
+  console.log("hash", transactionHash);
+  const receipt = await userOpResponse.wait();
+  console.log("receipt", receipt);
+};
 
 const buyBuilding = async (smartAccount) => {
   const encodedCall = encodeFunctionData({
@@ -42,18 +45,21 @@ const buyBuilding = async (smartAccount) => {
     functionName: "buy_or_upgrade_storage",
     args: [],
   });
-  const userOpResponse = await smartAccount.sendTransaction({
-    to: gameManagerAddress,
-    data: encodedCall,
-  }, {
-    paymasterServiceData: { mode: PaymasterMode.SPONSORED }
-  });
+  const userOpResponse = await smartAccount.sendTransaction(
+    {
+      to: gameManagerAddress,
+      data: encodedCall,
+    },
+    {
+      paymasterServiceData: { mode: PaymasterMode.SPONSORED },
+    }
+  );
 
   const { transactionHash } = await userOpResponse.waitForTxHash();
-  console.log('hash', transactionHash);
-  const receipt = await userOpResponse.wait()
-  console.log('receipt', receipt);
-}
+  console.log("hash", transactionHash);
+  const receipt = await userOpResponse.wait();
+  console.log("receipt", receipt);
+};
 
 export class Game extends Scene {
   constructor() {
@@ -244,7 +250,6 @@ export class Game extends Scene {
     const barX = 800;
     const barY = 30;
 
-
     const updateCoinBar = () => {
       const percentFilled = (coinCount / coinBarCapacity) * 100;
       coinBar.clear();
@@ -286,14 +291,18 @@ export class Game extends Scene {
     };
 
     // Show the balance text below the coin bar
-    const balanceText = this.add.text(750, 70, "Storage: " + coinCount + "/" + coinBarCapacity + " coins", {
-      fontSize: "20px",
-      //yellow color
-      fill: "#fff",
-      // bold
-      fontStyle: "bold",
-
-    });
+    const balanceText = this.add.text(
+      750,
+      70,
+      "Storage: " + coinCount + "/" + coinBarCapacity + " coins",
+      {
+        fontSize: "20px",
+        //yellow color
+        fill: "#fff",
+        // bold
+        fontStyle: "bold",
+      }
+    );
 
     const updateBalance = () => {
       // Update the balance based on the current coin count
@@ -345,11 +354,10 @@ export class Game extends Scene {
         latestTooltip = cointooltip;
       },
     });
-    updateCoinBar()
+    updateCoinBar();
     // Increment mine count and update bar when a coin is found
     const incrementMine = () => {
-      if (mineCount < mineCapacity) 
-        mineCount++;
+      if (mineCount < mineCapacity) mineCount++;
     };
 
     // Trigger incrementMine every 1 minutes
@@ -455,6 +463,26 @@ export class Game extends Scene {
     // Add ethcoin image next to the buy button
     const ethcoinImageArmy = this.add.image(110, 70, "ethcoin").setScale(0.1);
     shopPopup.add(ethcoinImageArmy);
+
+    // Add attack icon on bottom right
+    const attackButton = this.add.image(950, 700, "attack");
+    attackButton.scale = 0.38;
+    attackButton.setInteractive();
+    attackButton.on("pointerover", () => {
+      attackButton.setScale(0.4);
+    });
+    attackButton.on("pointerout", () => {
+      attackButton.setScale(0.38);
+    });
+
+    attackButton.on("pointerup", () => {
+      this.scene.transition({
+        target: "Attack",
+        duration: 3000, // 3 seconds duration for the transition
+        moveBelow: true, // Place the "Attack" scene below the "Game" scene during transition
+        onUpdate: this.transitionOut, // Function to handle transition updates
+      });
+    });
 
     // Function to handle buy button click
     const handleBuyButtonClick = (button, buildingSprite) => {
@@ -574,6 +602,10 @@ export class Game extends Scene {
         type: "text",
         enterClose: true,
         selectAll: true,
+        onTextChanged: function (textObject, text) {
+          textObject.text = text;
+          goldCoinAmount.text = (parseFloat(text) * 100).toString();
+        }
       });
 
       // Add Gold Coin Amount box
@@ -595,11 +627,11 @@ export class Game extends Scene {
         .setOrigin(0.5);
       addLiquidityPopup.add(goldCoinAmount);
 
-      this.plugins.get("rextexteditplugin").add(goldCoinAmount, {
-        type: "text",
-        enterClose: true,
-        selectAll: true,
-      });
+      // this.plugins.get("rextexteditplugin").add(goldCoinAmount, {
+      //   type: "text",
+      //   enterClose: true,
+      //   selectAll: true,
+      // });
 
       // Add "Add Liquidity" button
       const addLiquidityButton = this.add.sprite(0, 110, "buttonTexture"); // Adjust position and use the correct image for the button
@@ -617,6 +649,7 @@ export class Game extends Scene {
       addLiquidityButton.on("pointerup", () => {
         // Add your logic here for adding liquidity
         console.log("Add Liquidity button clicked");
+        console.log(usdcAmount.text+ " " + goldCoinAmount.text);
       });
 
       this.tweens.add({
@@ -699,6 +732,10 @@ export class Game extends Scene {
         type: "text",
         enterClose: true,
         selectAll: true,
+        onTextChanged: function (textObject, text) {
+          textObject.text = text;
+          goldCoinAmount.text = (parseFloat(text) * 100).toString();
+        }
       });
 
       // Add Gold Coin Amount box
@@ -720,11 +757,11 @@ export class Game extends Scene {
         .setOrigin(0.5);
       swapPopup.add(goldCoinAmount);
 
-      this.plugins.get("rextexteditplugin").add(goldCoinAmount, {
-        type: "text",
-        enterClose: true,
-        selectAll: true,
-      });
+      // this.plugins.get("rextexteditplugin").add(goldCoinAmount, {
+      //   type: "text",
+      //   enterClose: true,
+      //   selectAll: true,
+      // });
 
       // Add "Add Liquidity" button
       const swapButton = this.add.sprite(0, 110, "buttonTexture"); // Adjust position and use the correct image for the button
@@ -742,6 +779,7 @@ export class Game extends Scene {
       swapButton.on("pointerup", () => {
         // Add your logic here for adding liquidity
         console.log("Swap button clicked");
+        console.log(usdcAmount.text+ " " + goldCoinAmount.text);
       });
 
       this.tweens.add({
@@ -750,5 +788,12 @@ export class Game extends Scene {
         duration: 500,
       });
     };
+  }
+
+  transitionOut(progress) {
+    // Custom transition effects can be added here
+    // For fading effect, you can manipulate the alpha of objects
+    // For example, fading out the entire scene gradually:
+    this.cameras.main.fadeOut(1000 * progress); // Fading out over 1 second
   }
 }
