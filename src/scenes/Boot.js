@@ -30,6 +30,9 @@ export class Boot extends Scene
         this.load.image('goldStorage', 'assets/goldStorage.png');
         this.load.image('armyCamp', 'assets/armyCamp.png');
         this.load.image('attack', 'assets/attack.png');
+        this.load.image('armyBase', 'assets/armyBase.png');
+        this.load.image('cannonBullet', 'assets/cannonBullet.png');
+        this.load.image('fireball', 'assets/fireball.png');
     }
 
     create ()
