@@ -30,6 +30,11 @@ export class Attack extends Scene {
     //  It is called after the Game Scene and is used to display the results of the attack
     this.add.image(512, 384, "armyBase");
 
+    const bgm = this.sound.add("attackBgm", { loop: true });
+    this.time.delayedCall(2000, () => {
+      bgm.play();
+    });
+
     let buildingCount = 3;
     let currentCount = 0;
 
@@ -41,6 +46,56 @@ export class Attack extends Scene {
 
     let cannonFireRate = 3000; // Duration of cannon bullet animation
     let charizardFireballRate = 4000; // Duration of charizard fireball animation
+
+    // Create HP bars
+    const townhallHPBar = this.add.rectangle(530, 260, 200, 20, 0xff0000);
+    const cannon1HPBar = this.add.rectangle(350, 300, 150, 15, 0xff0000);
+    const cannon2HPBar = this.add.rectangle(680, 340, 150, 15, 0xff0000);
+    const charizard1HPBar = this.add.rectangle(130, 660, 100, 10, 0x00ff00);
+    const charizard2HPBar = this.add.rectangle(130, 610, 100, 10, 0x00ff00);
+
+    // Set initial HP bar sizes
+    townhallHPBar.displayWidth = 200 * (townhallHP / 2400);
+    cannon1HPBar.displayWidth = 150 * (cannon1HP / 1200);
+    cannon2HPBar.displayWidth = 150 * (cannon2HP / 1200);
+    charizard1HPBar.displayWidth = 100 * (charizard1HP / 1000);
+    charizard2HPBar.displayWidth = 100 * (charizard2HP / 1000);
+
+    // Add titles above HP bars
+    const townhallTitle = this.add.text(530, 230, "Townhall", {
+      fontSize: "18px",
+      fill: "#000",
+      fontStyle: "bold",
+    });
+    townhallTitle.setOrigin(0.5, 0.5);
+
+    const cannon1Title = this.add.text(350, 280, "Cannon 1", {
+      fontSize: "18px",
+      fill: "#000",
+      fontStyle: "bold",
+    });
+    cannon1Title.setOrigin(0.5, 0.5);
+
+    const cannon2Title = this.add.text(680, 320, "Cannon 2", {
+      fontSize: "18px",
+      fill: "#000",
+      fontStyle: "bold",
+    });
+    cannon2Title.setOrigin(0.5, 0.5);
+
+    const charizard1Title = this.add.text(130, 640, "Charizard 1", {
+      fontSize: "18px",
+      fill: "#fff",
+      fontStyle: "bold",
+    });
+    charizard1Title.setOrigin(0.5, 0.5);
+
+    const charizard2Title = this.add.text(130, 590, "Charizard 2", {
+      fontSize: "18px",
+      fill: "#fff",
+      fontStyle: "bold",
+    });
+    charizard2Title.setOrigin(0.5, 0.5);
 
     const townhall = this.add.sprite(530, 300, "townhall");
     townhall.scale = 0.4;
@@ -168,6 +223,7 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             charizard1HP -= 100; // Reduce the charizard's HP when the bullet hits
+            charizard1HPBar.displayWidth = 100 * (charizard1HP / 1000); // Update HP bar
             console.log("Charizard 1 HP:", charizard1HP);
             // bullet.destroy(); // Destroy the bullet sprite when animation completes
             if (charizard1HP <= 0 || cannon1HP <= 0) {
@@ -191,6 +247,7 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             charizard2HP -= 100;
+            charizard2HPBar.displayWidth = 100 * (charizard2HP / 1000); // Update HP bar
             console.log("Charizard 2 HP:", charizard2HP);
             // bullet.destroy(); // Destroy the bullet sprite when animation completes
             if (charizard2HP <= 0 || cannon2HP <= 0) {
@@ -214,6 +271,7 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             cannon1HP -= 200;
+            cannon1HPBar.displayWidth = 100 * (cannon1HP / 1000); // Update HP bar
             console.log("Cannon 1 HP:", cannon1HP);
             // fireball.destroy(); // Destroy the bullet sprite when animation completes
             if (charizard1HP <= 0 || cannon1HP <= 0) {
@@ -237,6 +295,7 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             cannon2HP -= 200;
+            cannon2HPBar.displayWidth = 100 * (cannon2HP / 1000); // Update HP bar
             console.log("Cannon 2 HP:", cannon2HP);
             // fireball2.destroy(); // Destroy the bullet sprite when animation completes
             if (charizard2HP <= 0 || cannon2HP <= 0) {
@@ -252,20 +311,12 @@ export class Attack extends Scene {
         });
       });
       this.time.delayedCall(21500, () => {
-        const fireball3 = this.add.sprite(
-          500,
-          250,
-          "fireball"
-        );
+        const fireball3 = this.add.sprite(500, 250, "fireball");
         fireball3.scale = 0.05;
         // fireball3.flipY = true;
         fireball3.flipX = true;
 
-        const fireball4 = this.add.sprite(
-          575,
-          350,
-          "fireball"
-        );
+        const fireball4 = this.add.sprite(575, 350, "fireball");
         fireball4.scale = 0.05;
         fireball4.flipY = true;
         const fireballTween3 = this.tweens.add({
@@ -277,15 +328,23 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             townhallHP -= 200;
+            townhallHPBar.displayWidth = 100 * (townhallHP / 1000); // Update HP bar
             console.log("Townhall HP:", townhallHP);
             // fireball.destroy(); // Destroy the bullet sprite when animation completes
             if (townhallHP <= 0) {
               fireballTween3.remove();
+              fireballTween4.remove();
               fireball3.destroy();
               fireball4.destroy();
               townhall.setTexture("destroyedCannon");
               currentCount += 1;
-              console.log("Attack Percentage: "+(currentCount/buildingCount)*100+"%");
+              console.log(
+                "Attack Percentage: " +
+                  (currentCount / buildingCount) * 100 +
+                  "%"
+              );
+              const attackPercentage = (currentCount / buildingCount) * 100;
+              this.showResultScreen(attackPercentage, bgm); // Call the showResultScreen method with the attack percentage
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -300,20 +359,72 @@ export class Attack extends Scene {
           repeat: 100,
           onRepeat: () => {
             townhallHP -= 200;
+            townhallHPBar.displayWidth = 100 * (townhallHP / 1000); // Update HP bar
             console.log("Townhall HP:", townhallHP);
             // fireball.destroy(); // Destroy the bullet sprite when animation completes
             if (townhallHP <= 0) {
               fireballTween4.remove();
+              fireballTween3.remove();
               fireball4.destroy();
               fireball3.destroy();
               townhall.setTexture("destroyedCannon");
               currentCount += 1;
-              console.log("Attack Percentage: "+(currentCount/buildingCount)*100+"%");
+              console.log(
+                "Attack Percentage: " +
+                  (currentCount / buildingCount) * 100 +
+                  "%"
+              );
+              const attackPercentage = (currentCount / buildingCount) * 100;
+              this.showResultScreen(attackPercentage, bgm); // Call the showResultScreen method with the attack percentage
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
         });
       });
+    });
+  }
+
+  showResultScreen(attackPercentage, bgm) {
+    // Add code to show the result screen
+    this.add.image(512, 384, "popupBackground").setDepth(10); // Background image
+    const resultPercent = this.add
+      .text(-15, -60, `Destruction: ${attackPercentage}%`, {
+        fontSize: "36px",
+        fill: "#0000ff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5, 0.5); // Attack percentage text
+
+    const resultsPopup = this.add.container(512, 384);
+    resultsPopup.setDepth(105);
+
+    const popupBackground = this.add.image(0, 0, "popupBackground");
+    resultsPopup.add(popupBackground);
+
+    const popupText = this.add.text(0, -200, "Result", {
+      fontFamily: "Brush Script",
+      fontSize: "48px",
+      color: "#000",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      align: "center",
+    });
+    popupText.setOrigin(0.5);
+    resultsPopup.add(popupText);
+    resultsPopup.add(resultPercent);
+
+    const backToHomeButton = this.add.sprite(0, 130, "buttonTexture");
+    backToHomeButton.scale = 0.8;
+    const buttonText = this.add.text(-80, 120, "Back to Home", {
+      fontSize: "24px",
+      fill: "#fff",
+    });
+    backToHomeButton.setInteractive();
+    resultsPopup.add(backToHomeButton);
+    resultsPopup.add(buttonText);
+    backToHomeButton.on("pointerdown", () => {
+      bgm.stop(); // Stop the background music
+      this.scene.start("Game");
     });
   }
 }

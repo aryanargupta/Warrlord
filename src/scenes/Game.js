@@ -540,9 +540,10 @@ export class Game extends Scene {
     });
 
     attackButton.on("pointerup", () => {
+      bgm.stop();
       this.scene.transition({
         target: "Attack",
-        duration: 3000, // 3 seconds duration for the transition
+        duration: 1000, // 1 seconds duration for the transition
         moveBelow: true, // Place the "Attack" scene below the "Game" scene during transition
         onUpdate: this.transitionOut, // Function to handle transition updates
       });

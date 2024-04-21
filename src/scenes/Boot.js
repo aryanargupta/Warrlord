@@ -34,6 +34,7 @@ export class Boot extends Scene
         this.load.image('cannonBullet', 'assets/cannonBullet.png');
         this.load.image('fireball', 'assets/fireball.png');
         this.load.image('destroyedCannon', 'assets/destroyedCannon.png');
+        this.load.audio('attackBgm', ['assets/attackBgm.mp3']);
     }
 
     create ()
