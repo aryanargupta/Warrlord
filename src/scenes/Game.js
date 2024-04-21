@@ -551,6 +551,7 @@ export class Game extends Scene {
     // Function to handle buy button click
     const handleBuyButtonClick = (button, buildingSprite) => {
       button.setTint(0x808080); // Dim the button
+      button.disableInteractive();
       this.time.delayedCall(1000, () => {
         // Wait for 1 second
         shopPopup.setVisible(false); // Close the shop
