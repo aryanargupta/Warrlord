@@ -30,6 +30,9 @@ export class Attack extends Scene {
     //  It is called after the Game Scene and is used to display the results of the attack
     this.add.image(512, 384, "armyBase");
 
+    let buildingCount = 3;
+    let currentCount = 0;
+
     let townhallHP = 2400;
     let cannon1HP = 1200;
     let cannon2HP = 1200;
@@ -173,6 +176,7 @@ export class Attack extends Scene {
               fireball.destroy();
               bullet.destroy();
               cannon1.setTexture("destroyedCannon");
+              currentCount += 1;
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -195,6 +199,7 @@ export class Attack extends Scene {
               fireball2.destroy();
               bullet2.destroy();
               cannon2.setTexture("destroyedCannon");
+              currentCount += 1;
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -217,6 +222,7 @@ export class Attack extends Scene {
               fireball.destroy();
               bullet.destroy();
               cannon1.setTexture("destroyedCannon");
+              currentCount += 1;
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -239,6 +245,7 @@ export class Attack extends Scene {
               fireball2.destroy();
               bullet2.destroy();
               cannon2.setTexture("destroyedCannon");
+              currentCount += 1;
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -277,6 +284,8 @@ export class Attack extends Scene {
               fireball3.destroy();
               fireball4.destroy();
               townhall.setTexture("destroyedCannon");
+              currentCount += 1;
+              console.log("Attack Percentage: "+(currentCount/buildingCount)*100+"%");
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
@@ -298,6 +307,8 @@ export class Attack extends Scene {
               fireball4.destroy();
               fireball3.destroy();
               townhall.setTexture("destroyedCannon");
+              currentCount += 1;
+              console.log("Attack Percentage: "+(currentCount/buildingCount)*100+"%");
             }
             // Optionally, you can add logic here for what happens when the bullet reaches its target
           },
